@@ -1,7 +1,9 @@
 package pipeline
 
-import "github.com/gin-gonic/gin"
-import "fmt"
+import (
+	"github.com/gin-gonic/gin"
+	"fmt"
+)
 
 func IndexHandler(c *gin.Context) {
 	fmt.Print("hello")
