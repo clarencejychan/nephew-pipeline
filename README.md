@@ -14,6 +14,13 @@ If you need to install any other dependencies as you're working, simply go to th
 Finally, run `go run main.go` to start up the server. The framework does not come with hot-reload out of the box, so that's something we can look into.
 
 ### DB Setup
+As of now, we are planning on using MongoDB.
+
+If you're using WSL (Windows Susbsystem for Linux) [follow these instructions to download MongoDB](https://github.com/michaeltreat/Windows-Subsystem-For-Linux-Setup-Guide/blob/master/readmes/installs/MongoDB.md).
+
+If you're using a Mac [follow these ones](https://docs.mongodb.com/manual/installation/)
+
+Remember to make sure you have the folder `/data/db` created.
 
 #### Dumping Data from the DB
 #### Importing Data into the DB
