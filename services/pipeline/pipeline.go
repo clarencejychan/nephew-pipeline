@@ -2,12 +2,14 @@ package pipeline
 
 import (
 	"github.com/gin-gonic/gin"
-	"fmt"
+	"github.com/clarencejychan/nephew-pipeline/models"
 )
 
-func IndexHandler(c *gin.Context) {
-	fmt.Print("hello")
-	c.JSON(200, gin.H{
-		"message" : "pong",
-	})
+func IndexHandler(db models.MongoDatastore) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message" : "Index Handler for DB Services",
+		})
+	}
+	return gin.HandlerFunc(fn)
 }
