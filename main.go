@@ -1,18 +1,24 @@
 package main
 
 import (
+	"log"
 	"github.com/gin-gonic/gin"
-	"github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	"github.com/clarencejychan/nephew-pipeline/routers/db"
+	pipeline_routes 			"github.com/clarencejychan/nephew-pipeline/routers/pipeline"
+	db_routes 					"github.com/clarencejychan/nephew-pipeline/routers/db"
+	"github.com/clarencejychan/nephew-pipeline/models"
 )
 
 func main() {
+	db, err := models.NewDB()
+	// Eventually need to set-up a way to retry the server connection.
+	if err != nil {
+		log.Println(err)
+	}
 	router := gin.Default()
 
 	// Router Groups
-	pipeline.Routes(router)
-	db.Routes(router)
-
+	pipeline_routes.Routes(router, db)
+	db_routes.Routes(router, db)
 
 	router.Run()
 }
