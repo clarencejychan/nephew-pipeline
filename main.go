@@ -14,6 +14,12 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
+
+	// example db insert:
+	// 		collection: 	the collection name 
+	// 		obj: 			any db interface object
+	// err = db.Insert(collection, obj)
+
 	router := gin.Default()
 
 	// Router Groups

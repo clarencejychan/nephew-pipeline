@@ -46,3 +46,13 @@ func (m *MongoDB) Close() error {
 	err := m.Client.Disconnect(ctx)
 	return err
 }
+
+func (m *MongoDB) Insert(c string, d interface{}) error {
+	// Default to sandbox db for now with the name DB1, change when moving to prod
+	collection := m.Client.Database("DB1").Collection(c)
+
+	insertResult, err := collection.InsertOne(context.TODO(), d)
+
+	fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
+	return err
+}
