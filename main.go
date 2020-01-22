@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	pipeline_routes 			"github.com/clarencejychan/nephew-pipeline/routers/pipeline"
 	db_routes 					"github.com/clarencejychan/nephew-pipeline/routers/db"
@@ -12,7 +12,7 @@ func main() {
 	db, err := models.NewDB()
 	// Eventually need to set-up a way to retry the server connection.
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err.Error())
 	}
 
 	// example db insert:

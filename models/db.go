@@ -12,6 +12,7 @@ import (
 
 type MongoDatastore interface {
 	Close() error
+	Insert(string, interface{}) error
 }
 
 type MongoDB struct {

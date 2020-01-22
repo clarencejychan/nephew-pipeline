@@ -11,5 +11,5 @@ type Comment struct {
 	Length					uint			`json:"length"`
 	Parent					uint			`json:"parent"`
 	Children				[]int 			`json:"children"`
-	Metadata				Metadata_Reddit	`json:"metadata"`
+	//Metadata				Metadata_Reddit	`json:"metadata"`
 }
