@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"github.com/gin-gonic/gin"
-	pipeline_routes 			"github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	db_routes 					"github.com/clarencejychan/nephew-pipeline/routers/db"
+	pipeline_routes             "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
+	db_routes                   "github.com/clarencejychan/nephew-pipeline/routers/db"
 	"github.com/clarencejychan/nephew-pipeline/models"
+	pushshift_routes            "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 	// Router Groups
 	pipeline_routes.Routes(router, db)
 	db_routes.Routes(router, db)
+	pushshift_routes.Routes(router)
 
 	router.Run()
 }
