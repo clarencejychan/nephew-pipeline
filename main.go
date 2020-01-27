@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	pipeline_routes 			"github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	db_routes 					"github.com/clarencejychan/nephew-pipeline/routers/db"
 	"github.com/clarencejychan/nephew-pipeline/models"
+	pushshift_routes            "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
+	pipeline_routes             "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
+	db_routes                   "github.com/clarencejychan/nephew-pipeline/routers/db"
+	api_routes					"github.com/clarencejychan/nephew-pipeline/routers/api"
 )
 
 func main() {
@@ -25,6 +27,8 @@ func main() {
 	// Router Groups
 	pipeline_routes.Routes(router, db)
 	db_routes.Routes(router, db)
+	api_routes.Routes(router, db)
+	pushshift_routes.Routes(router)
 
 	router.Run()
 }
