@@ -1,6 +1,5 @@
 package models
 
-
 type Comment struct {
 	Id     					uint			`json:"id"`
 	Comment 				string 			`json:"comment"`
