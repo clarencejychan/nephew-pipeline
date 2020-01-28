@@ -13,6 +13,7 @@ import (
 type MongoDatastore interface {
 	Close() error
 	Insert(string, interface{}) error
+	BulkInsert(string, []interface{}) error
 }
 
 type MongoDB struct {
@@ -47,6 +48,16 @@ func (m *MongoDB) Close() error {
 	err := m.Client.Disconnect(ctx)
 	return err
 }
+
+func (m *MongoDB) BulkInsert(c string, d []interface{}) error {
+	collection := m.Client.Database("DB1").Collection(c)
+
+	insertResult, err := collection.InsertMany(context.TODO(), d)
+	fmt.Println("Inserted bulk documents: ", insertResult.InsertedIDs)
+	return err;
+}
+
+
 
 func (m *MongoDB) Insert(c string, d interface{}) error {
 	// Default to sandbox db for now with the name DB1, change when moving to prod
