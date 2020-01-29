@@ -28,7 +28,7 @@ func main() {
 	pipeline_routes.Routes(router, db)
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
-	pushshift_routes.Routes(router)
+	pushshift_routes.Routes(router, db)
 
 	router.Run()
 }
