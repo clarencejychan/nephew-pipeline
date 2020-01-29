@@ -15,6 +15,7 @@ func Routes(route *gin.Engine, m models.MongoDatastore) {
 	api := route.Group("/api") 
 	{
 		api.GET("/update_all_players", api_service.Update_All_Players(m))
-		api.GET("/player/:id", api_service.Get_Player(m))
+		api.GET("/player/id/:id", api_service.Get_Player_By_ID(m))
+		api.GET("/player/name/:name", api_service.Get_Player_By_Name(m))
 	}
 }
