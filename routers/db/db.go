@@ -15,5 +15,6 @@ func Routes(route *gin.Engine, m models.MongoDatastore) {
 	db := route.Group("/db") 
 	{
 		db.GET("/", db_service.IndexHandler(m))
+		db.POST("/insert", db_service.InsertHandler(m))
 	}
 }
