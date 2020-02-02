@@ -1,13 +1,15 @@
 package db
 
 import (
+	"net/http"
+	"log"
 	"github.com/gin-gonic/gin"
 	"github.com/clarencejychan/nephew-pipeline/models"
 )
 
 func IndexHandler(db models.MongoDatastore) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message" : "Index Handler for DB Services",
 		})
 	}
@@ -17,7 +19,7 @@ func IndexHandler(db models.MongoDatastore) gin.HandlerFunc {
 // How shoudl we query this?
 func GetCommentsHandler(db models.MongoDatastore) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message" : "PlaceHolder",
 		})
 	}
@@ -32,12 +34,13 @@ func InsertHandler(db models.MongoDatastore) gin.HandlerFunc {
 		err = db.Insert("collection1", &comment)
 
 		if err != nil {
-			c.JSON(500, gin.H{
-				"message": err.Error(),
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
 			})
 			return
 		}
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message" : comment.Id,
 		})
 	}

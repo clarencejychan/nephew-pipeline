@@ -17,21 +17,21 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 					  query, after, before, sub)
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err.Error())
 	}
 
 	// defers closing the response body until end of function, prevents resource leaks
 	defer resp.Body.Close()
 
-	body, err2 := ioutil.ReadAll(resp.Body)
-	if err2 != nil {
-		log.Fatalln(err2)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err.Error())
 	}
 
 	var pushShiftQueryResult PushshiftQuery
-	err3 := json.Unmarshal(body, &pushShiftQueryResult)
-	if err3 != nil {
-		log.Fatalln(err3)
+	err = json.Unmarshal(body, &pushShiftQueryResult)
+	if err != nil {
+		log.Println(err.Error())
 	}
 
 	for i := range pushShiftQueryResult.Data {
@@ -41,10 +41,12 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 	return pushShiftQueryResult, url
 }
 
+
+// Test handler
 func IndexHandler(c *gin.Context) {
 	pushShiftQueryResult, url := getPushshiftDataComment("Harden", "4d", "2d", "nba")
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"Lebron" : url,
 		"Harden" : pushShiftQueryResult.Data[0],
 		"Sucks" : pushShiftQueryResult.Data[4],
