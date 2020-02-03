@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"strings"
 	"net/http"
 	"strconv"
@@ -26,7 +27,8 @@ func Update_All_Players(db models.MongoDatastore) gin.HandlerFunc {
 		resp, err := http.Get(url)
 		
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(), 
 			})
 		}
@@ -38,7 +40,8 @@ func Update_All_Players(db models.MongoDatastore) gin.HandlerFunc {
 		var query PlayersResponse
 		err = json.Unmarshal(body, &query.Players)
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
@@ -52,12 +55,13 @@ func Update_All_Players(db models.MongoDatastore) gin.HandlerFunc {
 
 		err = db.BulkInsert("collection1", b)
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
 	
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"inserted":string(body),
 		})
 	}
@@ -69,7 +73,8 @@ func Get_Player_By_ID(db models.MongoDatastore) gin.HandlerFunc {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
@@ -81,7 +86,8 @@ func Get_Player_By_ID(db models.MongoDatastore) gin.HandlerFunc {
 		err = db.FindOne("collection1", filter, &queryResult)
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
@@ -89,12 +95,13 @@ func Get_Player_By_ID(db models.MongoDatastore) gin.HandlerFunc {
 		result, err := json.Marshal(queryResult)
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
 
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message" : string(result),
 		})
 	}
@@ -122,7 +129,8 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 		cursor, err := db.FindAll("collection1", o, filter)
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
@@ -133,7 +141,8 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 			var player models.Player
 			err := cursor.Decode(&player)
 			if err != nil {
-				c.JSON(400, gin.H{
+				log.Println(err.Error())
+				c.JSON(http.StatusBadRequest, gin.H{
 					"error" : err.Error(),
 				})
 			}
@@ -144,14 +153,21 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 		cursor.Close(context.Background());
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error" : err.Error(),
 			})
 		}
 
 		result, err := json.Marshal(results)
+		if err != nil {
+			log.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error" : err.Error(),
+			})
+		}
 
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message" : string(result),
 		})
 	}
