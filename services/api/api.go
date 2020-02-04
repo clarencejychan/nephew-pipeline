@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"log"
+	"fmt"
 	"strings"
 	"net/http"
 	"strconv"
@@ -110,18 +111,42 @@ func Get_Player_By_ID(db models.MongoDatastore) gin.HandlerFunc {
 
 func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		name := strings.Title(strings.ToLower(c.Param("name")))
-		
-		filter := bson.D{
-			{"$or",
-				bson.A{
-					bson.D{{"first_name", name}},
-					bson.D{{"last_name", name}},
+		name := strings.Title(c.Param("name"))
+		part := c.Param("part")
+		fmt.Println(part)
+		fields := strings.Fields(name)
+
+		var filter bson.D
+		if part == "full" {
+			// Know it's at least a full name
+			filter = bson.D{
+				{"$or",
+					bson.A{
+						bson.D{{"first_name", fields[0]}},
+						bson.D{{"last_name", fields[1]}},
+					},
 				},
-			},
+			}
+			fmt.Println(fields)
+		} else if part == "first" {
+			// Is it a first name or last name
+			filter = bson.D{
+				{"$or",
+					bson.A{
+						bson.D{{"first_name", fields[0]}},
+					},
+				},
+			}
+			fmt.Println(fields)
+		} else {
+			filter = bson.D{
+				{"$or",
+					bson.A{
+						bson.D{{"last_name", fields[0]}},
+					},
+				},
+			}
 		}
-		
-		//filter := bson.D{primitive.E{Key: "first_name", Value: name}}
 
 		o := options.Find()
 		o.SetLimit(10)
