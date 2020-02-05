@@ -1,7 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"io"
+	"log"
+	"path/filepath"
+	"os"
 	"github.com/gin-gonic/gin"
 	"github.com/clarencejychan/nephew-pipeline/models"
 	pushshift_routes            "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
@@ -11,10 +14,27 @@ import (
 )
 
 func main() {
+	// Initialize Logging.
+	absPath, err := filepath.Abs("./logs")
+	if err != nil {
+		panic(err)
+	}
+	
+	f, _ := os.Create(absPath + "/gin.log")
+	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	
+	app_log, err := os.OpenFile(absPath + "/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	log.SetOutput(app_log)
+
+	defer app_log.Close()
+
 	db, err := models.NewDB()
 	// Eventually need to set-up a way to retry the server connection.
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 	}
 
 	// example db insert:

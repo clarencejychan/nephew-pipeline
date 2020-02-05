@@ -46,22 +46,21 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 					  query, after, before, sub)
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err.Error())
 	}
 
 	// defers closing the response body until end of function, prevents resource leaks
 	defer resp.Body.Close()
 
-	body, err2 := ioutil.ReadAll(resp.Body)
-	if err2 != nil {
-		log.Fatalln(err2)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err.Error())
 	}
 
-	// process pushshift response
 	var comments PushshiftQuery
-	err3 := json.Unmarshal(body, &comments)
-	if err3 != nil {
-		log.Fatalln(err3)
+	err = json.Unmarshal(body, &comments)
+	if err != nil {
+		log.Println(err.Error())
 	}
 
 	// append subject to comments struct

@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"log"
 	"time"
 	"os"
 	"fmt"
@@ -56,7 +57,7 @@ func (m *MongoDB) BulkInsert(c string, d []interface{}) error {
 	collection := m.Client.Database("DB1").Collection(c)
 
 	insertResult, err := collection.InsertMany(context.Background(), d)
-	fmt.Println("Inserted bulk documents: ", insertResult.InsertedIDs)
+	log.Println("Inserted bulk documents: ", insertResult.InsertedIDs)
 	return err;
 }
 
@@ -66,7 +67,7 @@ func (m *MongoDB) Insert(c string, d interface{}) error {
 
 	insertResult, err := collection.InsertOne(context.Background(), d)
 
-	fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
+	log.Println("Inserted a Single Document: ", insertResult.InsertedID)
 	return err
 }
 
