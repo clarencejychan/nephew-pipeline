@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"log"
-	"fmt"
 	"strings"
 	"net/http"
 	"strconv"
@@ -113,7 +112,6 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		name := c.Param("name")
 		part := c.Param("part")
-		fmt.Println(part)
 		fields := strings.Fields(name)
 
 		var filter bson.D
@@ -127,7 +125,6 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 					},
 				},
 			}
-			fmt.Println(fields)
 		} else if part == "first" {
 			// Is it a first name or last name
 			filter = bson.D{
@@ -137,7 +134,6 @@ func Get_Player_By_Name(db models.MongoDatastore) gin.HandlerFunc {
 					},
 				},
 			}
-			fmt.Println(fields)
 		} else {
 			filter = bson.D{
 				{"$or",
