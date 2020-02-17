@@ -3,14 +3,15 @@ package main
 import (
 	"io"
 	"log"
-	"path/filepath"
 	"os"
-	"github.com/gin-gonic/gin"
+	"path/filepath"
+
 	"github.com/clarencejychan/nephew-pipeline/models"
-	pushshift_routes            "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
-	pipeline_routes             "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	db_routes                   "github.com/clarencejychan/nephew-pipeline/routers/db"
-	api_routes					"github.com/clarencejychan/nephew-pipeline/routers/api"
+	api_routes "github.com/clarencejychan/nephew-pipeline/routers/api"
+	db_routes "github.com/clarencejychan/nephew-pipeline/routers/db"
+	"github.com/gin-gonic/gin"
+
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines/reddit"
 )
 
 func main() {
@@ -19,33 +20,35 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	f, _ := os.Create(absPath + "/gin.log")
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-	
-	app_log, err := os.OpenFile(absPath + "/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	app_log, err := os.OpenFile(absPath+"/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
 	log.SetOutput(app_log)
-
 	defer app_log.Close()
 
+	// Initialize Database
 	db, err := models.NewDB()
 	// Eventually need to set-up a way to retry the server connection.
 	if err != nil {
 		log.Println(err.Error())
 	}
 
+	// Initialize the pipelines
+	reddit_pipeline := reddit.New(db)
+
 	// example db insert:
-	// 		collection: 	the collection name 
+	// 		collection: 	the collection name
 	// 		obj: 			any db interface object
 	// err = db.Insert(collection, obj)
 
 	router := gin.Default()
 
 	// Router Groups
-	pipeline_routes.Routes(router, db)
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
 	pushshift_routes.Routes(router, db)
