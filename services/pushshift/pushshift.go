@@ -7,41 +7,48 @@ import "log"
 import "net/http"
 import "encoding/json"
 import "github.com/clarencejychan/nephew-pipeline/models"
+import "bytes"
 
 type PushshiftQuery struct {
 	Data	[]models.Comment		`json:"data"`
 }
 
+type AnalysisRequset struct {
+	Topic	string					`json:"topic"`
+	Comments []models.Comment		`json:"comments"`
+}
+
+
 type AnalysisResponse struct {
-	Semantic_Rating		float64
+	PlayerId	int					`json:"playerId`
+	Comments	[]models.Comment	`json:"comments`
 }
 
 func GetComment(db models.MongoDatastore) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 
 		// get pushshift comment
-		comments, url := getPushshiftDataComment("Harden", "4d", "2d", "nba")
+		comments, topic, url := getPushshiftDataComment("Harden", "4d", "2d", "nba")
 
 		// get analysis result on each comment
-		var commentsWithRating PushshiftQuery
-		for i := range comments.Data {
-			commentWithRating := getAnalysisResult(comments.Data[i])
-			commentsWithRating.Data = append(commentsWithRating.Data, commentWithRating)
+		analysisReq := AnalysisRequset {
+			Topic: topic,
+			Comments: comments.Data,
 		}
+
+		resp:= getAnalysisResult(analysisReq)
 
 		// write to db
 
 		c.JSON(200, gin.H{
-			"Lebron" : url,
-			"Harden" : commentsWithRating.Data[0],
-			"Sucks" : commentsWithRating.Data[4].Subject,
-			"TestRating" : commentsWithRating.Data[0].Semantic_Rating,
+			"url": url,
+			"result": resp,
 		})
 	}
 	return gin.HandlerFunc(fn)
 }
 
-func getPushshiftDataComment(query string, after string, before string, sub string) (PushshiftQuery, string) {
+func getPushshiftDataComment(query string, after string, before string, sub string) (PushshiftQuery, string, string) {
 	url := fmt.Sprintf("https://api.pushshift.io/reddit/search/comment/?q=%s&size=5&after=%s&before=%s&subreddit=%s", 
 					  query, after, before, sub)
 	resp, err := http.Get(url)
@@ -63,39 +70,32 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 		log.Println(err.Error())
 	}
 
-	// append subject to comments struct
-	for i := range comments.Data {
-		comments.Data[i].Subject = query
-	}
-
-	return comments, url
+	return comments, query, url
 }
 
-func getAnalysisResult(comment models.Comment) (models.Comment) {
-	// content := comment.Comment
-	// subject := comment.Subject
+func getAnalysisResult(req AnalysisRequset) (AnalysisResponse) {
+	url := "http://127.0.0.1:5000/get-sentiments"
 
-	// url := "***ANALYSIS API LOCALHOST PORT WITH PARAMETERS***"
+	b, err := json.Marshal(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	// resp, err := http.Get(url)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(b))
 		
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
+	if err != nil {
+		log.Fatalln(err)
+	}
 	
-	// // defers closing the response body until end of function, prevents resource leaks
-	// defer resp.Body.Close()
-	// body, _ := ioutil.ReadAll(resp.Body)
+	// defers closing the response body until end of function, prevents resource leaks
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
 
-	// var response AnalysisResponse
-	// err = json.Unmarshal(body, &response)
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
+	var response AnalysisResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	result := comment
-	// result.Semantic_Rating = response.Semantic_Rating
-	result.Semantic_Rating = 6.4
-
-	return result
+	return response
 }
