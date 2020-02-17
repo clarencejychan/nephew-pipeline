@@ -11,6 +11,7 @@ import (
 	pipeline_routes             "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
 	db_routes                   "github.com/clarencejychan/nephew-pipeline/routers/db"
 	api_routes					"github.com/clarencejychan/nephew-pipeline/routers/api"
+	scheduler_routes			"github.com/clarencejychan/nephew-pipeline/routers/scheduler"
 )
 
 func main() {
@@ -49,6 +50,7 @@ func main() {
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
 	pushshift_routes.Routes(router, db)
+	scheduler_routes.Routes(router)
 
 	router.Run()
 }
