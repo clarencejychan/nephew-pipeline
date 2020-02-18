@@ -1,9 +1,10 @@
 package scheduler
 
 import (
-	"fmt"
+	"net/http"
 	"github.com/gin-gonic/gin"
 )
+
 
 func CreateSchedulerTask(c *gin.Context) {
 		destination := c.PostForm("destination")
@@ -12,10 +13,11 @@ func CreateSchedulerTask(c *gin.Context) {
 		occurence_num := c.PostForm("occurence_num")
 		occurence_unit := c.PostForm("occurence_unit")
 
-		fmt.Println("I ran")
-		fmt.Println(destination)
-		fmt.Println(time)
-		fmt.Println(parameters)
-		fmt.Println(occurence_num)
-		fmt.Println(occurence_unit)
+		c.JSON(http.StatusOK, gin.H{
+			"destination": destination,
+			"time": time,
+			"parameters" : parameters,
+			"occurence_num" : occurence_num,
+			"occurence_unit" : occurence_unit,
+	})
 }
