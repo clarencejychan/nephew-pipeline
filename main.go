@@ -1,17 +1,17 @@
 package main
 
 import (
+	"github.com/clarencejychan/nephew-pipeline/models"
+	api_routes "github.com/clarencejychan/nephew-pipeline/routers/api"
+	db_routes "github.com/clarencejychan/nephew-pipeline/routers/db"
+	pipeline_routes "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
+	pushshift_routes "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
+	scheduler_routes "github.com/clarencejychan/nephew-pipeline/routers/scheduler"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
-	"path/filepath"
 	"os"
-	"github.com/gin-gonic/gin"
-	"github.com/clarencejychan/nephew-pipeline/models"
-	pushshift_routes            "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
-	pipeline_routes             "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	db_routes                   "github.com/clarencejychan/nephew-pipeline/routers/db"
-	api_routes					"github.com/clarencejychan/nephew-pipeline/routers/api"
-	scheduler_routes			"github.com/clarencejychan/nephew-pipeline/routers/scheduler"
+	"path/filepath"
 )
 
 func main() {
@@ -20,11 +20,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	f, _ := os.Create(absPath + "/gin.log")
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-	
-	app_log, err := os.OpenFile(absPath + "/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	app_log, err := os.OpenFile(absPath+"/app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// example db insert:
-	// 		collection: 	the collection name 
+	// 		collection: 	the collection name
 	// 		obj: 			any db interface object
 	// err = db.Insert(collection, obj)
 
@@ -50,7 +50,7 @@ func main() {
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
 	pushshift_routes.Routes(router, db)
-	scheduler_routes.Routes(router)
+	scheduler_routes.Routes(router, db)
 
 	router.Run()
 }
