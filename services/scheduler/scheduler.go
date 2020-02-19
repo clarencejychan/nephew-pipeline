@@ -1,7 +1,6 @@
 package scheduler
 
 import (
-	"github.com/clarencejychan/nephew-pipeline/models"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -9,7 +8,7 @@ import (
 	"time"
 )
 
-func CreateSchedulerTask(db models.MongoDatastore) gin.HandlerFunc {
+func CreateSchedulerTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		destination := c.PostForm("destination")
 		scheduler_time := createTime(c.PostForm("scheduler_time"))

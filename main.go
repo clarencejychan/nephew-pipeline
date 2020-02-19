@@ -50,7 +50,7 @@ func main() {
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
 	pushshift_routes.Routes(router, db)
-	scheduler_routes.Routes(router, db)
+	scheduler_routes.Routes(router)
 
 	router.Run()
 }
