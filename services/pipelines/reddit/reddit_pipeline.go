@@ -20,7 +20,7 @@ type AnalysisResponse struct {
 }
 
 type AnalysisRequest struct {
-	Topic    string           `json:"topic"`
+	PlayerId    int           `json:"playerId"`
 	Comments []models.Comment `json:"comments"`
 }
 
@@ -30,11 +30,11 @@ type RedditPipeline struct {
 
 func (p *RedditPipeline) getComment(params map[string]string) error {
 	// get pushshift comment
-	comments, topic, url, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")
+	comments, url, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")	
 
 	// get analysis result on each comment
 	analysisReq := AnalysisRequest{
-		Topic:    topic,
+		PlayerId: 123,
 		Comments: comments.Data,
 	}
 
@@ -43,7 +43,7 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 	return err
 }
 
-func getPushshiftDataComment(query string, after string, before string, sub string) (PushshiftQuery, string, string, error) {
+func getPushshiftDataComment(query string, after string, before string, sub string) (PushshiftQuery, string, error) {
 	url := fmt.Sprintf("https://api.pushshift.io/reddit/search/comment/?q=%s&size=5&after=%s&before=%s&subreddit=%s",
 		query, after, before, sub)
 	resp, err := http.Get(url)
@@ -56,7 +56,7 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 	var comments PushshiftQuery
 	err = json.Unmarshal(body, &comments)
 
-	return comments, query, url, err
+	return comments, url, err
 }
 
 func getAnalysisResult(req AnalysisRequest) (AnalysisResponse, error) {
