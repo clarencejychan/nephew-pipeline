@@ -40,6 +40,12 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 
 	resp, err := getAnalysisResult(analysisReq)
 
+	for i,  _ := range resp.Comments {
+		resp.Comments[i].Player_Id = resp.PlayerId
+	}
+
+	p.db.bulkInsert("comments", resp.Comments)
+
 	return err
 }
 
