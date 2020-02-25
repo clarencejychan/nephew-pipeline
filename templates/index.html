@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<style>
+    label {
+        padding-top: 20px;
+        font-size: 16px;
+    }
+</style>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #E3F2FD;">
+        <div class="container">
+            <a class="navbar-brand" href="#">Nephew Admin</a>
+        </div>
+    </nav>
+    <div class="container">
+        <form class="form" action="/scheduler/create" method="POST">
+            <!-- Destination -->
+            <div class="form-row">
+                <label for="destination">Destination</label>
+                <div class="col-md-12">
+                    <select class="form-control" id="destination" name="destination">
+                        <option>Reddit</option>
+                        <option>Twitter</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Parameters -->
+            <label for="time">Parameters</label>
+            <div class="form-row">
+                <div class="form-group col-md-6" style="margin: 0px">
+                    <input class="form-control" type="text" id="keys" name="keys" placeholder="Keys, delimited by ','">
+                </div>
+                <div class="form-group col-md-6" style="margin: 0px">
+                    <input class="form-control" type="text" id="values" name="values"
+                        placeholder="Values, delimited by ',' (e.g. name,height)">
+                </div>
+            </div>
+            <!-- Time -->
+            <label for="scheduler_time">Date and time</label>
+            <div class="form-row">
+                <div class="col-md-12">
+                    <input class="form-control" type="datetime-local" id="scheduler_time" name="scheduler_time">
+                </div>
+            </div>
+            <!-- Occurence -->
+            <label for="occurence">Occurence</label>
+            <div class="form-row">
+                <p>Every: </p>
+                <div class="form-group col-md-6">
+                    <input class="form-control" type="number" id="occurence_num" name="occurence_num"
+                        placeholder="Choose a number">
+                </div>
+                <div class="form-group col-md-6">
+                    <select class="form-control" id="occurence_unit" name="occurence_unit">
+                        <option>Day(s)</option>
+                        <option>Week(s)</option>
+                        <option>Month(s)</option>
+                        <option>Year(s)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-info" style="margin: 15px;">Submit</button>
+        </form>
+    </div>
+</body>
+
+</html>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
