@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// Initialize the pipelines
-	reddit_pipeline := reddit.New(db)
+	_ = reddit.New(db)
 
 	// example db insert:
 	// 		collection: 	the collection name
@@ -51,7 +51,6 @@ func main() {
 	// Router Groups
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
-	pushshift_routes.Routes(router, db)
 
 	router.Run()
 }

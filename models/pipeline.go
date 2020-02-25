@@ -11,6 +11,5 @@ type PipelineResult struct {
 }
 
 type Pipeline interface {
-	New(*MongoDB) Pipeline
 	Run(map[string]string) *PipelineResult
 }

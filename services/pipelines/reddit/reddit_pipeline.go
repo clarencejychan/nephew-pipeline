@@ -20,7 +20,7 @@ type AnalysisResponse struct {
 }
 
 type AnalysisRequest struct {
-	PlayerId    int           `json:"playerId"`
+	PlayerId int              `json:"playerId"`
 	Comments []models.Comment `json:"comments"`
 }
 
@@ -30,7 +30,7 @@ type RedditPipeline struct {
 
 func (p *RedditPipeline) getComment(params map[string]string) error {
 	// get pushshift comment
-	comments, url, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")	
+	comments, _, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")
 
 	// get analysis result on each comment
 	analysisReq := AnalysisRequest{
@@ -40,11 +40,17 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 
 	resp, err := getAnalysisResult(analysisReq)
 
-	for i,  _ := range resp.Comments {
+	for i, _ := range resp.Comments {
 		resp.Comments[i].Player_Id = resp.PlayerId
 	}
 
-	p.db.bulkInsert("comments", resp.Comments)
+	// Necessary, maybe we should put this in the bulk insert function
+	x := make([]interface{}, len(resp.Comments))
+	for i := range resp.Comments {
+		x[i] = resp.Comments[i]
+	}
+
+	p.db.BulkInsert("comments", x)
 
 	return err
 }
@@ -82,10 +88,8 @@ func getAnalysisResult(req AnalysisRequest) (AnalysisResponse, error) {
 	return response, err
 }
 
-func (p *RedditPipeline) New(db *models.MongoDB) models.Pipeline {
-	pipeline := new(RedditPipeline)
-	pipeline.db = db
-	return pipeline
+func New(db *models.MongoDB) models.Pipeline {
+	return &RedditPipeline{db: db}
 }
 
 // Implement
