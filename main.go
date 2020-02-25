@@ -39,7 +39,9 @@ func main() {
 	}
 
 	// Initialize the pipelines
-	_ = reddit.New(db)
+	reddit_pipeline := reddit.New(db)
+	test := map[string]string{}
+	reddit_pipeline.Run(test)
 
 	// example db insert:
 	// 		collection: 	the collection name

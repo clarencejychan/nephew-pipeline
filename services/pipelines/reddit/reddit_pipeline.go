@@ -49,7 +49,6 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 	for i := range resp.Comments {
 		x[i] = resp.Comments[i]
 	}
-
 	p.db.BulkInsert("comments", x)
 
 	return err
