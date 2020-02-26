@@ -12,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/clarencejychan/nephew-pipeline/services/pipelines/reddit"
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines/twitter"
+
 )
 
 func main() {
@@ -43,6 +45,9 @@ func main() {
 	test := map[string]string{}
 	reddit_pipeline.Run(test)
 
+	twitter_pipeline := twitter.New(db)
+	twitter_pipeline.Run(test)
+	
 	// example db insert:
 	// 		collection: 	the collection name
 	// 		obj: 			any db interface object

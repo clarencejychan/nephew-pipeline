@@ -1,6 +1,5 @@
 package twitter
 
-import "github.com/gin-gonic/gin"
 import "log"
 import "os"
 import "github.com/clarencejychan/nephew-pipeline/models"
@@ -8,9 +7,10 @@ import "github.com/dghubble/go-twitter/twitter"
 import "golang.org/x/oauth2"
 import "golang.org/x/oauth2/clientcredentials"
 import "time"
+import "github.com/clarencejychan/nephew-pipeline/services/pipelines"
 
-type AnalysisResponse struct {
-	Semantic_Rating		float64
+type TwitterPipeline struct {
+	db *models.MongoDB
 }
 
 func SetUpClient() *twitter.Client {
@@ -32,39 +32,46 @@ func SetUpClient() *twitter.Client {
 	return client
 }
 
-func GetComment(db models.MongoDatastore) gin.HandlerFunc {
-	fn := func(c *gin.Context) {
-		comments, newSinceId := getTwitterCommentsForPlayer("James Harden", 0) // SinceID will need to be pulled from the Task. Something to store saying this was the last tweet read
-		
-		// get analysis result on each comment
-		var commentsWithRating []models.Comment
-		for i := range comments {
-			//commentWithRating := getAnalysisResult(comments[i])
-			// Temp until the analysis is done being merged in and settled
-			comments[i].Semantic_Rating = 10
-			commentWithRating := comments[i]
-			commentsWithRating = append(commentsWithRating, commentWithRating)
-		}
+func New(db *models.MongoDB) models.Pipeline {
+	return &TwitterPipeline{db: db}
+}
 
-		// Write to db and set task to have the next Sinceid
-		c.JSON(200, gin.H{
-		"Lebron" : "Goat",
-		"Harden" : newSinceId,
-		})
+func (p *TwitterPipeline) getComment(params map[string]string) (int64, error) {
+	// params["sinceId"] instead of 0 when ready
+	// params["query"] etc
+	comments, newSinceId, err := getTwitterCommentsForPlayer("James Harden", 0) 
 
+	// get analysis result on each comment
+	analysisReq := pipelines.AnalysisRequest{
+		PlayerId: 123,
+		Comments: comments,
 	}
-	return gin.HandlerFunc(fn)
+
+	resp, err := pipelines.GetAnalysisResult(analysisReq)
+
+	// Necessary, maybe we should put this in the bulk insert function
+	x := make([]interface{}, len(resp.Comments))
+	for i := range resp.Comments {
+		x[i] = resp.Comments[i]
+	}
+	p.db.BulkInsert("comments", x)
+
+	return newSinceId, err
 }
 
 // Currently we aim to just get any mentions of the player in question
-func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment, int64) {
+func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment, int64, error) {
 	client := SetUpClient()
 	var comments []models.Comment
 	var maxId int64 = 0
 	var newSinceId int64 = 0
+	// 450 reqs per 15 min window = 0.5 request a second
+	rate:= time.Second / 2
+	throttle := time.Tick(rate)
 
-	log.info("Query: %s\n. SinceId: %d", query, sinceId))
+	log.Println("Query: %s\n. SinceId: %d", query, sinceId)
 	for {
+		<- throttle
 		search, _, err := client.Search.Tweets(&twitter.SearchTweetParams{
 			Query: query,
 			ResultType: "recent",
@@ -75,6 +82,7 @@ func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment,
 
 		if err != nil {
 			log.Println(err.Error())
+			return nil, 0, err
 		}
 
 		len := len(search.Statuses)
@@ -111,5 +119,20 @@ func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment,
 			break
 		}
 	}
-	return comments, newSinceId
+	return comments, newSinceId, nil
+}
+
+// Implement
+func (p *TwitterPipeline) Run(params map[string]string) *models.PipelineResult {
+	sinceId, err := p.getComment(params)
+	result := new(models.PipelineResult)
+
+	if err != nil {
+		result.Status = 0
+		result.Message = err.Error()
+	} else {
+		result.Status = 1
+		result.Message = "SUCCESS" + string(sinceId)
+	}
+	return result
 }

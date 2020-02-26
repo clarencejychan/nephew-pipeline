@@ -1,27 +1,16 @@
 package reddit
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines"
 	"github.com/clarencejychan/nephew-pipeline/models"
 )
 
 type PushshiftQuery struct {
 	Data []models.Comment `json:"data"`
-}
-
-type AnalysisResponse struct {
-	PlayerId int              `json:"playerId`
-	Comments []models.Comment `json:"comments`
-}
-
-type AnalysisRequest struct {
-	PlayerId int              `json:"playerId"`
-	Comments []models.Comment `json:"comments"`
 }
 
 type RedditPipeline struct {
@@ -33,12 +22,12 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 	comments, _, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")
 
 	// get analysis result on each comment
-	analysisReq := AnalysisRequest{
+	analysisReq := pipelines.AnalysisRequest{
 		PlayerId: 123,
 		Comments: comments.Data,
 	}
 
-	resp, err := getAnalysisResult(analysisReq)
+	resp, err := pipelines.GetAnalysisResult(analysisReq)
 
 	for i, _ := range resp.Comments {
 		resp.Comments[i].Player_Id = resp.PlayerId
@@ -68,23 +57,6 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 	err = json.Unmarshal(body, &comments)
 
 	return comments, url, err
-}
-
-func getAnalysisResult(req AnalysisRequest) (AnalysisResponse, error) {
-	url := "http://127.0.0.1:5000/get-sentiments"
-
-	b, err := json.Marshal(req)
-
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(b))
-
-	// defers closing the response body until end of function, prevents resource leaks
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	var response AnalysisResponse
-	err = json.Unmarshal(body, &response)
-
-	return response, err
 }
 
 func New(db *models.MongoDB) models.Pipeline {
