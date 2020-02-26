@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/clarencejychan/nephew-pipeline/models"
-	api_routes "github.com/clarencejychan/nephew-pipeline/routers/api"
-	db_routes "github.com/clarencejychan/nephew-pipeline/routers/db"
-	pipeline_routes "github.com/clarencejychan/nephew-pipeline/routers/pipeline"
-	pushshift_routes "github.com/clarencejychan/nephew-pipeline/routers/pushshift"
-	scheduler_routes "github.com/clarencejychan/nephew-pipeline/routers/scheduler"
-	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/clarencejychan/nephew-pipeline/models"
+	api_routes "github.com/clarencejychan/nephew-pipeline/routers/api"
+	db_routes "github.com/clarencejychan/nephew-pipeline/routers/db"
+	"github.com/gin-gonic/gin"
+
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines/reddit"
 )
 
 func main() {
@@ -29,14 +29,19 @@ func main() {
 		panic(err)
 	}
 	log.SetOutput(app_log)
-
 	defer app_log.Close()
 
+	// Initialize Database
 	db, err := models.NewDB()
 	// Eventually need to set-up a way to retry the server connection.
 	if err != nil {
 		log.Println(err.Error())
 	}
+
+	// Initialize the pipelines
+	reddit_pipeline := reddit.New(db)
+	test := map[string]string{}
+	reddit_pipeline.Run(test)
 
 	// example db insert:
 	// 		collection: 	the collection name
@@ -46,11 +51,8 @@ func main() {
 	router := gin.Default()
 
 	// Router Groups
-	pipeline_routes.Routes(router, db)
 	db_routes.Routes(router, db)
 	api_routes.Routes(router, db)
-	pushshift_routes.Routes(router, db)
-	scheduler_routes.Routes(router)
 
 	router.Run()
 }

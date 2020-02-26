@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/DataDog/zstd v1.4.4 // indirect
+	github.com/dghubble/go-twitter v0.0.0-20190719072343-39e5462e111f
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
@@ -21,6 +22,7 @@ require (
 	github.com/xdg/stringprep v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.2.1
 	golang.org/x/crypto v0.0.0-20200115085410-6d4e4cb37c7d // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect

@@ -10,5 +10,6 @@ type Comment struct {
 	Parent					string			`json:"parent_id"`
 	Children				[]int 			`json:"-"`
 	Subject					string			`json:"-"`
+	Player_Id				int				`json:"player_id"`
 	Metadata				Metadata_Reddit	`json:"-"`
 }
