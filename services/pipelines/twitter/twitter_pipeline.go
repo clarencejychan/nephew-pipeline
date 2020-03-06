@@ -88,7 +88,7 @@ func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment,
 		len := len(search.Statuses)
 
 		var i int = 0
-		for i < len {
+		for i < 10 {
 			tweet := search.Statuses[i]
 			
 			// Set this so we know for the next run
@@ -109,11 +109,12 @@ func getTwitterCommentsForPlayer(query string, sinceId int64) ([]models.Comment,
 			comment.Parent = tweet.InReplyToStatusIDStr
 			//comment.Children = If children is just reply count, it's part of metadata
 			comment.Subject = query
-
 			// comment.Metadata = Later if there's a need for Metadata
 			comments = append(comments,comment)
+		
+			i++
 		}
-
+		break
 		// We reached the end so break
 		if len != 100 {
 			break
