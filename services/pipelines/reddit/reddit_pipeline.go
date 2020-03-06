@@ -31,6 +31,7 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 
 	for i, _ := range resp.Comments {
 		resp.Comments[i].Player_Id = resp.PlayerId
+		resp.Comments[i].Source = "Reddit"
 	}
 
 	// Necessary, maybe we should put this in the bulk insert function
