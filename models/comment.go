@@ -3,7 +3,7 @@ package models
 type Comment struct {
 	Id     					string			`json:"id"`
 	Comment 				string 			`json:"body"`
-	Source					string 			`json:"-"`
+	Source					string 			`json:"source"`
 	Semantic_Rating			float64 		`json:"semantic_rating"`
 	Date					uint			`json:"created_utc"`
 	Author					string			`json:"author"`
