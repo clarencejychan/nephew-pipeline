@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/clarencejychan/nephew-pipeline/models"
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines/aggregator"
 )
 
 type PushshiftQuery struct {
@@ -50,6 +51,9 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 		x[i] = resp.Comments[i]
 	}
 	p.db.BulkInsert("comments", x)
+
+	aggregator_pipeline := aggregator.AggregatorPipeline{Db: p.db}
+	aggregator_pipeline.UpdateSematicScores(resp.PlayerId, resp.Comments)
 
 	return err
 }
