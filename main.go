@@ -13,7 +13,6 @@ import (
 
 	"github.com/clarencejychan/nephew-pipeline/services/pipelines/reddit"
 	"github.com/clarencejychan/nephew-pipeline/services/pipelines/twitter"
-
 )
 
 func main() {

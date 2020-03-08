@@ -2,13 +2,14 @@ package models
 
 import (
 	"context"
-	"log"
-	"time"
-	"os"
 	"fmt"
+	"log"
+	"os"
+	"time"
+
 	"github.com/subosito/gotenv"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -18,6 +19,7 @@ type MongoDatastore interface {
 	BulkInsert(string, []interface{}) error
 	FindOne(string, bson.D, interface{}) error
 	FindAll(string, *options.FindOptions, bson.D) (*mongo.Cursor, error)
+	UpdateOne(c string, filter bson.D, d interface{}) error
 }
 
 type MongoDB struct {
@@ -36,8 +38,8 @@ func NewDB() (*MongoDB, error) {
 
 	// Init the database conector
 	client, err := mongo.NewClient(options.Client().ApplyURI(dbURL))
-	
-	// WithTimeout creates a goroutine that is retained unless cancel is called. 
+
+	// WithTimeout creates a goroutine that is retained unless cancel is called.
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	// cancels as soon as we exit out of the NewDB function.
 	defer cancel()
@@ -58,7 +60,7 @@ func (m *MongoDB) BulkInsert(c string, d []interface{}) error {
 
 	insertResult, err := collection.InsertMany(context.Background(), d)
 	log.Println("Inserted bulk documents: ", insertResult.InsertedIDs)
-	return err;
+	return err
 }
 
 func (m *MongoDB) Insert(c string, d interface{}) error {
@@ -81,4 +83,12 @@ func (m *MongoDB) FindAll(c string, o *options.FindOptions, filter bson.D) (*mon
 	collection := m.Client.Database("DB1").Collection(c)
 	cursor, err := collection.Find(context.Background(), filter, o)
 	return cursor, err
+}
+
+func (m *MongoDB) UpdateOne(c string, filter bson.D, d interface{}) error {
+	collection := m.Client.Database("DB1").Collection(c)
+	updateResult, err := collection.UpdateOne(context.Background(), filter, d)
+
+	log.Println("Updated a Single Document: ", updateResult)
+	return err
 }

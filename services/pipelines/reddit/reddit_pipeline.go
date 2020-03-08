@@ -1,12 +1,15 @@
 package reddit
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"github.com/clarencejychan/nephew-pipeline/services/pipelines"
+
 	"github.com/clarencejychan/nephew-pipeline/models"
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines/aggregator"
+	"github.com/clarencejychan/nephew-pipeline/services/pipelines"
 )
 
 type PushshiftQuery struct {
@@ -41,6 +44,9 @@ func (p *RedditPipeline) getComment(params map[string]string) error {
 	}
 	p.db.BulkInsert("comments", x)
 
+	aggregator_pipeline := aggregator.AggregatorPipeline{Db: p.db}
+	aggregator_pipeline.UpdateSematicScores(resp.PlayerId, resp.Comments)
+
 	return err
 }
 
@@ -59,6 +65,7 @@ func getPushshiftDataComment(query string, after string, before string, sub stri
 
 	return comments, url, err
 }
+
 
 func New(db *models.MongoDB) models.Pipeline {
 	return &RedditPipeline{db: db}
