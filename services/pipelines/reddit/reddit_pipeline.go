@@ -19,7 +19,11 @@ type RedditPipeline struct {
 
 func (p *RedditPipeline) getComment(params map[string]string) error {
 	// get pushshift comment
-	comments, _, err := getPushshiftDataComment("Harden", "4d", "2d", "nba")
+	comments, _, err := getPushshiftDataComment(
+		params["subject"], 
+		params["after"], 
+		params["before"], 
+		params["subreddit"])
 
 	// get analysis result on each comment
 	analysisReq := pipelines.AnalysisRequest{

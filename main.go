@@ -10,10 +10,10 @@ import (
 	api_routes "github.com/clarencejychan/nephew-pipeline/routers/api"
 	db_routes "github.com/clarencejychan/nephew-pipeline/routers/db"
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron/v3"
 
 	"github.com/clarencejychan/nephew-pipeline/services/pipelines/reddit"
-	"github.com/clarencejychan/nephew-pipeline/services/pipelines/twitter"
-
+	// "github.com/clarencejychan/nephew-pipeline/services/pipelines/twitter"
 )
 
 func main() {
@@ -42,16 +42,21 @@ func main() {
 
 	// Initialize the pipelines
 	reddit_pipeline := reddit.New(db)
-	test := map[string]string{}
-	reddit_pipeline.Run(test)
+	test_reddit := map[string]string{
+		"subject": "Harden",
+		"after": "4d",
+		"before": "2d",
+		"subreddit": "nba",
+	}
 
-	twitter_pipeline := twitter.New(db)
-	twitter_pipeline.Run(test)
-	
-	// example db insert:
-	// 		collection: 	the collection name
-	// 		obj: 			any db interface object
-	// err = db.Insert(collection, obj)
+	// twitter_pipeline := twitter.New(db)
+	// test_twitter := map[string]string{}
+
+	c := cron.New()
+	// "0 0 * * *" == everyday @ midnight
+	c.AddFunc("0 0 * * *", func() {reddit_pipeline.Run(test_reddit)})
+	// c.AddFunc("50 * * * *", twitter_pipeline.Run(test))
+	c.Start()
 
 	router := gin.Default()
 
