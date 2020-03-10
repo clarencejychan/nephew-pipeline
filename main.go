@@ -44,8 +44,8 @@ func main() {
 	reddit_pipeline := reddit.New(db)
 	test_reddit := map[string]string{
 		"subject": "Harden",
-		"after": "4d",
-		"before": "2d",
+		"after": "1d",
+		"before": "0d",
 		"subreddit": "nba",
 	}
 
